@@ -31,7 +31,7 @@ function createSearchParamsHelper(filterParams) {
 
 function ShoppingList() {
   const dispatch = useDispatch();
-  const { productList, productDetails } = useSelector((state) => state.shoppingProducts);
+  const { productList, productDetails, isLoading } = useSelector((state) => state.shoppingProducts);
   const [filters, setFilters] = useState({});
   const [sort, setSort] = useState(null);
   const [searchParams, setSearchParams] = useSearchParams();
@@ -181,7 +181,7 @@ console.log(cartItems, 'cartItems');
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 p-4 py-10">
           {productList && productList.length > 0
             ? productList.map((productItem) => (
-                <ShoppingProductTile product={productItem} handleGetProductDetails={handleGetProductDetails} handleAddToCart={handleAddToCart} />
+<ShoppingProductTile product={productItem} handleGetProductDetails={handleGetProductDetails} handleAddToCart={handleAddToCart} isLoading={isLoading}/>
               ))
             : null}
         </div>

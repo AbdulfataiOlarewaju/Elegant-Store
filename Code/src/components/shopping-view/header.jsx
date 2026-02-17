@@ -8,7 +8,7 @@ import {
   UserCogIcon,
 } from "lucide-react";
 import { Link, useLocation, useNavigate, useSearchParams } from "react-router-dom";
-import { Sheet, SheetContent, SheetTrigger } from "../ui/sheet";
+import { Sheet, SheetContent, SheetHeader, SheetTrigger } from "../ui/sheet";
 import { Button } from "../ui/button";
 import { shoppingViewHeaderMenuItems } from "@/config";
 import {
@@ -227,7 +227,8 @@ function ShoppingHeader() {
               <span className="sr-only">Toggle header menu</span>
             </Button>
           </SheetTrigger>
-          <SheetContent side="left" className="w-full max-w-xs bg-black text-white">
+          <SheetContent side="left" className="w-full max-w-xs bg-black text-white py-2">
+            <SheetHeader><h1 className="text-xl font-bold w-full px-3 cursor-pointer">Elegant Store</h1></SheetHeader>
             <MenuItems setOpen={setOpen} />
             <SideRightContent setOpen={setOpen} />
           </SheetContent>

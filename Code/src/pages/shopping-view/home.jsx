@@ -32,7 +32,7 @@ function ShoppingHome() {
   const slides = [backgroundImgOne, backgroundImgTwo, backgroundImgFour];
 
   const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
-  const { productList, productDetails } = useSelector(
+  const { productList, productDetails, isLoading } = useSelector(
     (state) => state.shoppingProducts
   );
   const { user } = useSelector((state) => state.auth);
@@ -236,7 +236,7 @@ function ShoppingHome() {
         <div className="container mx-auto px-4">
           <h2 className="text-4xl font-bold text-center text-white mb-7">
             Feature Products
-          </h2>
+          </h2> 
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 px-4">
             {productList && productList.length > 0
               ? recentProducts.map((productItem) => (
@@ -244,6 +244,7 @@ function ShoppingHome() {
                     product={productItem}
                     handleGetProductDetails={handleGetProductDetails}
                     handleAddToCart={handleAddToCart}
+                    isLoading={isLoading}
                   />
                 ))
               : null}

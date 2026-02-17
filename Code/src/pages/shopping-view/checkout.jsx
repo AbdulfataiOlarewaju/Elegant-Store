@@ -81,7 +81,7 @@ function ShoppingCheckOut() {
   }
   if(approvalURL){
     window.location.href = approvalURL
-  }
+  } 
     
 
 

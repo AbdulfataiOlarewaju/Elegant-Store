@@ -1,12 +1,42 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardFooter } from "@/components/ui/card";
+import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 
 function ShoppingProductTile({
   product,
   handleGetProductDetails,
   handleAddToCart,
+  isLoading
 }) {
+  if (isLoading) {
+    return (
+      <Card className="w-full max-w-sm mx-auto py-0 border shadow-sm shadow-neutral-600 overflow-hidden cursor-pointer">
+        <div className="flex flex-col gap-0">
+          <div className="relative bg-[#1a1a1a] w-full h-[300px] overflow-hidden rounded-t-lg">
+            <Skeleton className="w-full h-[300px] rounded-t-lg" />
+          </div>
+          <div className="w-full bg-[#000000f2] pt-2 rounded-b-lg">
+            <CardContent>
+              <Skeleton className="h-6 w-3/4 mb-2" />
+              <div className="flex justify-between items-center mt-2 mb-1">
+                <Skeleton className="h-4 w-20" />
+                <Skeleton className="h-4 w-16" />
+              </div>
+              <div className="flex justify-between items-center mb-2">
+                <Skeleton className="h-6 w-20" />
+                <Skeleton className="h-6 w-16" />
+              </div>
+            </CardContent>
+            <CardFooter className="flex justify-between items-center gap-x-4 pb-4">
+              <Skeleton className="h-10 w-full" />
+            </CardFooter>
+          </div>
+        </div>
+      </Card>
+    );
+  }
+
   return (
     <Card className="w-full max-w-sm mx-auto py-0 border shadow-sm shadow-neutral-600 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 overflow-hidden cursor-pointer ">
       <div className="flex flex-col gap-0">
@@ -34,7 +64,7 @@ function ShoppingProductTile({
           ) : null}
         </div>
         <div className="w-full bg-[#000000f2] pt-0 rounded-b-lg">
-          <CardContent>
+          <CardContent className="px-4 py-2">
             <h1 className="text-xl font-bold mt-2 text-white">
               {product?.title.length > 30
                 ? product?.title.substring(0, 23) + "..."
