@@ -22,7 +22,7 @@ import {
 } from "../ui/dropdown-menu";
 import { Avatar, AvatarFallback } from "../ui/avatar";
 import { useDispatch, useSelector } from "react-redux";
-import { logoutUser } from "@/store/auth-slice";
+import { logoutUser, resetTokenAndCredientials } from "@/store/auth-slice";
 import UserCartWrraper from "./cart-wrapper";
 import { useEffect, useState } from "react";
 import { fetchCartItems } from "@/store/shop/cart-slice";
@@ -43,7 +43,11 @@ function HeaderRightCOntent() {
   console.log(cartItems, "cartItems");
 
   function handleLogout() {
-    dispatch(logoutUser());
+    // dispatch(logoutUser());
+    dispatch(resetTokenAndCredientials()) // only add this because i  need to buy custom domain and use https to set cookie with secure flag otherwise it will not work in production
+    toast.success("Logged out successfully")
+    sessionStorage.clear() // only add this because i  need to buy custom domain and use https to set cookie with secure flag otherwise it will not work in production
+    navigate('/auth/login') // only add this because i  need to buy custom domain and use https to set cookie with secure flag otherwise it will not work in production
   }
   return (
     <div className="flex lg:items-center lg:flex-row flex-col gap-2">
@@ -116,7 +120,11 @@ function SideRightContent({ setOpen }) {
   console.log(cartItems, "cartItems");
 
   function handleLogout() {
-    dispatch(logoutUser());
+    // dispatch(logoutUser());
+    dispatch(resetTokenAndCredientials()) // only add this because i  need to buy custom domain and use https to set cookie with secure flag otherwise it will not work in production
+    toast.success("Logged out successfully")
+    sessionStorage.clear() // only add this because i  need to buy custom domain and use https to set cookie with secure flag otherwise it will not work in production
+    navigate('/auth/login') // only add this because i  need to buy custom domain and use https to set cookie with secure flag otherwise it will not work in production
   }
   return (
     <div className="px-4">

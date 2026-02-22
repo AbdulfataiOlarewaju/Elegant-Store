@@ -38,9 +38,15 @@ function App() {
   // }
   
   
-   useEffect(() => {
-    dispatch(checkAuth());
-  }, [dispatch]);
+  //  useEffect(() => {
+  //   dispatch(checkAuth());
+  // }, [dispatch]);
+
+useEffect(() => {
+  const token = JSON.parse(sessionStorage.getItem('token'))
+  dispatch(checkAuth(token));
+}, [dispatch]);
+
   return (
    <div className="flex flex-col overflow-hidden bg-white w-screen">
        <Toaster position="top-left" />

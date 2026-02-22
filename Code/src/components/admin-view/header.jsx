@@ -1,18 +1,23 @@
 import { AlignJustify, LogOut } from "lucide-react";
 import { Button } from "../ui/button";
 import { useDispatch } from "react-redux";
-import { logoutUser } from "@/store/auth-slice";
+import { logoutUser, resetTokenAndCredientials } from "@/store/auth-slice";
 import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
 
 
 
 
 function AdminHeader({setOpen}) {
     const dispatch = useDispatch()
+    const navigate = useNavigate();
 
     function handleLogout(){
-        dispatch(logoutUser())
-        toast.success("Logged out successfully")
+        // dispatch(logoutUser())
+        dispatch(resetTokenAndCredientials()) // only add this because i  need to buy custom domain and use https to set cookie with secure flag otherwise it will not work in production
+    toast.success("Logged out successfully")
+    sessionStorage.clear() // only add this because i  need to buy custom domain and use https to set cookie with secure flag otherwise it will not work in production
+    navigate('/auth/login') // only add this because i  need to buy custom domain and use https to set cookie with secure flag otherwise it will not work in production
     }
     return ( 
         <header className="flex  items-center justify-between  px-4 py-3 bg-black">

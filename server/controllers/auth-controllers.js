@@ -71,7 +71,18 @@ const loginUser = async (req, res)=>{
         }, process.env.JWT_SECRETE_KEY,  
     {expiresIn : '700m'})
 
-        res.cookie('token', token, {httpOnly : true, secure : false}).json({
+        // res.cookie('token', token, {httpOnly : true, secure : true}).json({
+        //     success : true,
+        //     message : "Logged in successfully",
+        //     user : {
+        //         userName : checkUser.userName,
+        //         email : checkUser.email,
+        //         role : checkUser.role,
+        //         id : checkUser._id 
+        //     },
+        //     token
+        // }) only use this when you buy the custom doain and use https
+        res.status(200).json({
             success : true,
             message : "Logged in successfully",
             user : {
@@ -102,8 +113,30 @@ const logOutUser = async(req, res)=>{
 
 
 // middileware
+// const authMiddleWare = async(req, res, next)=>{
+//     const token = req.cookies.token;
+//     if(!token){
+//         return res.status(401).json({
+//             success : false,
+//             message : 'Unauthorized User!'
+//         })
+//     }
+//     try {
+//         const decodedToken = jwt.verify(token, process.env.JWT_SECRETE_KEY)
+//         req.user = decodedToken
+//         next()
+//     } catch (error) {
+//          console.log(error);
+//         res.status(401).json({
+//             success : false,
+//             message : 'Unauthorized User!' 
+//         })
+//     }
+// }
+
 const authMiddleWare = async(req, res, next)=>{
-    const token = req.cookies.token;
+    const authHeader = req.headers['authorization']
+    const token = authHeader && authHeader.split(' ')[1] // because the token is in the format of
     if(!token){
         return res.status(401).json({
             success : false,

@@ -9,6 +9,7 @@ const initialState = ({
     isAthenticated : false,
      isLoading : true,
     user : null,
+    token : null // only add this because i  need to buy custom domain and use https to set cookie with secure flag otherwise it will not work in production
 });
 
 
@@ -50,17 +51,37 @@ export const logoutUser = createAsyncThunk('/auth/logout',
             return response.data
     }
 )
+// export const checkAuth = createAsyncThunk('/auth/checkauth',
+//     async() => {
+    
+//             const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/auth/check-auth`,
+//                 {
+//                     withCredentials : true,
+//                     headers : {
+//                         'Cache-Control' : 'no-store, no-cache, must-revalidate, proxy-revalidate'
+//                     }
+//                 }
+//             ) 
+            
+//             return response.data
+        
+//     }
+// )  
+// we need to add token as authorization header because we are not using cookie to store token in production because of secure flag issue and we are storing token in session storage instead
+
 export const checkAuth = createAsyncThunk('/auth/checkauth',
-    async() => {
+    async(token) => {
     
             const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/auth/check-auth`,
                 {
-                    withCredentials : true,
+                    
                     headers : {
+                        Authorization : `Bearer ${token}`,
                         'Cache-Control' : 'no-store, no-cache, must-revalidate, proxy-revalidate'
                     }
                 }
-            )
+            ) 
+            
             return response.data
         
     }
@@ -72,7 +93,12 @@ const authSlice = createSlice({
     initialState,
     reducers: {
         setUser:(state, action)=> {
-
+            state.user = action.payload
+        },
+        resetTokenAndCredientials : (state)=>{
+            state.token = null,
+            state.isAthenticated = false,  
+            state.user = null
         }
     },
     extraReducers : (builder)=> {
@@ -91,12 +117,15 @@ const authSlice = createSlice({
         }).addCase(loginUser.fulfilled, (state, action)=>{
             console.log(action);
             state.isLoading = false,
+            state.token = action.payload.token, // only add this because i  need to buy custom domain and use https to set cookie with secure flag otherwise it will not work in production
+            sessionStorage.setItem('token', JSON.stringify(action.payload.token)), // only add this because i  need to buy custom domain and use https to set cookie with secure flag otherwise it will not work in production
             state.isAthenticated = action.payload.success ? true : false,
             state.user = action.payload.success ? action.payload.user : null
         }).addCase(loginUser.rejected, (state)=>{
             state.isLoading= false,
             state.isAthenticated = false, 
             state.user = null
+             state.token = null
         }).addCase(checkAuth.pending, (state)=>{
             state.isLoading = true
         }).addCase(checkAuth.fulfilled, (state, action)=>{
@@ -118,6 +147,6 @@ const authSlice = createSlice({
     
 })
 
-export const {setUser} = authSlice.actions;
+export const {setUser, resetTokenAndCredientials} = authSlice.actions;
 
 export default authSlice.reducer;
