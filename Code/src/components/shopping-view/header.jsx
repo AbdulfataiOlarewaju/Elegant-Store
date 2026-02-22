@@ -128,9 +128,12 @@ function SideRightContent({ setOpen }) {
   }
   return (
     <div className="px-4">
-      <Sheet open={openCartSheet} onOpenChange={() => setOpenCartSheet(false)}>
+      <Sheet open={openCartSheet} onOpenChange={() => setOpenCartSheet(false)} >
         <Button
-          onClick={() => setOpenCartSheet(true)}
+          onClick={() => {
+            setOpenCartSheet(true)
+            setOpen(false)
+          }}
           className="bg-transparent hover:bg-transparent font-bold cursor-pointer relative"
         >
           <ShoppingCart className="w-10 h-10" />
@@ -156,7 +159,7 @@ function SideRightContent({ setOpen }) {
             </AvatarFallback>
           </Avatar>
         </DropdownMenuTrigger>
-        <DropdownMenuContent side="down" className="w-56 text-white bg-black mt-9">
+        <DropdownMenuContent side="left" className="w-56 text-white bg-black mt-[-10px]">
           <DropdownMenuLabel>
             Loged in as {user?.userName.toUpperCase()}
           </DropdownMenuLabel>
@@ -235,7 +238,7 @@ function ShoppingHeader() {
               <span className="sr-only">Toggle header menu</span>
             </Button>
           </SheetTrigger>
-          <SheetContent side="left" className="w-full max-w-xs bg-black text-white py-2">
+<SheetContent side="left" className="w-full max-w-xs bg-black text-white py-2" style={{ WebkitOverflowScrolling: 'touch'}}>
             <SheetHeader><h1 className="text-xl font-bold w-full px-3 cursor-pointer">Elegant Store</h1></SheetHeader>
             <MenuItems setOpen={setOpen} />
             <SideRightContent setOpen={setOpen} />
