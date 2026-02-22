@@ -132,7 +132,7 @@ function SideRightContent({ setOpen }) {
         <Button
           onClick={() => {
             setOpenCartSheet(true)
-            setOpen(false)
+            // setOpen(false)
           }}
           className="bg-transparent hover:bg-transparent font-bold cursor-pointer relative"
         >
