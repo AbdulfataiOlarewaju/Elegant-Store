@@ -6,4 +6,4 @@ cloudinay.config({
     api_secret : process.env.CLOUDINARY_API_SECRET
     
 })
-module.exports = cloudinay;
+module.exports = cloudinay; 
