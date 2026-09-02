@@ -17,7 +17,7 @@ import NonFound from "./pages/non-found";
 import { Toaster } from "sonner";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect } from "react";
-import { checkAuth, resetTokenAndCredientials } from "./store/auth-slice";
+import { checkAuth } from "./store/auth-slice";
 import PayPalReturnPage from "./pages/shopping-view/paypal-return";
 import PaymentSuccessPage from "./pages/shopping-view/payment-success";
 import PaypalCancelPage from "./pages/shopping-view/paypal-cancel";
@@ -43,22 +43,8 @@ function App() {
   // }, [dispatch]);
 
 useEffect(() => {
-  try {
-    const rawToken = sessionStorage.getItem('token');
-    const token = rawToken ? JSON.parse(rawToken) : null;
-    const safeToken = typeof token === 'string' && token.trim() && token !== 'null' && token !== 'undefined' ? token : null;
-
-    if (safeToken) {
-      dispatch(checkAuth(safeToken));
-      return;
-    }
-
-    sessionStorage.removeItem('token');
-    dispatch(resetTokenAndCredientials());
-  } catch (error) {
-    sessionStorage.removeItem('token');
-    dispatch(resetTokenAndCredientials());
-  }
+  const token = JSON.parse(sessionStorage.getItem('token'))
+  dispatch(checkAuth(token));
 }, [dispatch]);
 
   return (
