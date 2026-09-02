@@ -70,20 +70,28 @@ export const logoutUser = createAsyncThunk('/auth/logout',
 // we need to add token as authorization header because we are not using cookie to store token in production because of secure flag issue and we are storing token in session storage instead
 
 export const checkAuth = createAsyncThunk('/auth/checkauth',
-    async(token) => {
-    
+    async(token, { rejectWithValue }) => {
+        if (typeof token !== "string" || !token.trim()) {
+            return rejectWithValue({ message: "Missing authentication token" });
+        }
+
+        try {
             const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/auth/check-auth`,
                 {
                     
                     headers : {
                         Authorization : `Bearer ${token}`,
                         'Cache-Control' : 'no-store, no-cache, must-revalidate, proxy-revalidate'
-                    }
+                    },
+                    timeout: 10000
                 }
             ) 
             
             return response.data
-        
+        } catch (error) {
+            sessionStorage.removeItem("token");
+            return rejectWithValue(error.response?.data || { message: "Unable to verify authentication" });
+        }
     }
 )
 
@@ -96,9 +104,10 @@ const authSlice = createSlice({
             state.user = action.payload
         },
         resetTokenAndCredientials : (state)=>{
-            state.token = null,
-            state.isAthenticated = false,  
-            state.user = null
+            state.token = null;
+            state.isAthenticated = false;
+            state.isLoading = false;
+            state.user = null;
         }
     },
     extraReducers : (builder)=> {
@@ -118,7 +127,7 @@ const authSlice = createSlice({
             console.log(action);
             state.isLoading = false,
             state.token = action.payload.token, // only add this because i  need to buy custom domain and use https to set cookie with secure flag otherwise it will not work in production
-            sessionStorage.setItem('token', JSON.stringify(action.payload.token)), // only add this because i  need to buy custom domain and use https to set cookie with secure flag otherwise it will not work in production
+            sessionStorage.setItem('token', action.payload.token), // only add this because i  need to buy custom domain and use https to set cookie with secure flag otherwise it will not work in production
             state.isAthenticated = action.payload.success ? true : false,
             state.user = action.payload.success ? action.payload.user : null
         }).addCase(loginUser.rejected, (state)=>{
@@ -135,13 +144,16 @@ const authSlice = createSlice({
         }).addCase(checkAuth.rejected, (state)=>{
             state.isLoading= false,
             state.isAthenticated = false, 
-            state.user = null
+            state.user = null,
+            state.token = null
         }).addCase(logoutUser.pending, (state)=>{
             state.isLoading = true
         }).addCase(logoutUser.fulfilled, (state)=>{
+            sessionStorage.removeItem('token');
             state.isLoading = false,
             state.isAthenticated = false,
-            state.user = null
+            state.user = null,
+            state.token = null
         })
     }
     

@@ -17,7 +17,7 @@ import NonFound from "./pages/non-found";
 import { Toaster } from "sonner";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect } from "react";
-import { checkAuth } from "./store/auth-slice";
+import { checkAuth, resetTokenAndCredientials } from "./store/auth-slice";
 import PayPalReturnPage from "./pages/shopping-view/paypal-return";
 import PaymentSuccessPage from "./pages/shopping-view/payment-success";
 import PaypalCancelPage from "./pages/shopping-view/paypal-cancel";
@@ -43,7 +43,25 @@ function App() {
   // }, [dispatch]);
 
 useEffect(() => {
-  const token = JSON.parse(sessionStorage.getItem('token'))
+  const storedToken = sessionStorage.getItem("token");
+
+  // Older versions saved the token with JSON.stringify. Support that format
+  // once, but do not make an authentication request when there is no token.
+  let token = storedToken;
+  if (storedToken?.startsWith('"')) {
+    try {
+      token = JSON.parse(storedToken);
+    } catch {
+      token = null;
+    }
+  }
+
+  if (typeof token !== "string" || !token.trim() || token === "null" || token === "undefined") {
+    sessionStorage.removeItem("token");
+    dispatch(resetTokenAndCredientials());
+    return;
+  }
+
   dispatch(checkAuth(token));
 }, [dispatch]);
 

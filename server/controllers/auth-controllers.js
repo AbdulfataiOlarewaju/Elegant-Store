@@ -136,8 +136,8 @@ const logOutUser = async(req, res)=>{
 
 const authMiddleWare = async(req, res, next)=>{
     const authHeader = req.headers['authorization']
-    const token = authHeader && authHeader.split(' ')[1] // because the token is in the format of
-    if(!token){
+    const [scheme, token] = authHeader?.trim().split(/\s+/) || [];
+    if(scheme !== 'Bearer' || !token || token === 'null' || token === 'undefined'){
         return res.status(401).json({
             success : false,
             message : 'Unauthorized User!'
