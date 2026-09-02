@@ -69,21 +69,32 @@ export const logoutUser = createAsyncThunk('/auth/logout',
 // )  
 // we need to add token as authorization header because we are not using cookie to store token in production because of secure flag issue and we are storing token in session storage instead
 
+const normalizeToken = (token) => {
+    if (typeof token !== 'string') return null;
+    const cleanedToken = token.trim();
+    return cleanedToken && cleanedToken !== 'null' && cleanedToken !== 'undefined' ? cleanedToken : null;
+};
+
 export const checkAuth = createAsyncThunk('/auth/checkauth',
-    async(token) => {
-    
+    async(token, { rejectWithValue }) => {
+        const safeToken = normalizeToken(token);
+        if (!safeToken) {
+            return rejectWithValue({ success: false, message: 'Unauthorized User!' });
+        }
+
+        try {
             const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/auth/check-auth`,
                 {
-                    
                     headers : {
-                        Authorization : `Bearer ${token}`,
+                        Authorization : `Bearer ${safeToken}`,
                         'Cache-Control' : 'no-store, no-cache, must-revalidate, proxy-revalidate'
                     }
                 }
-            ) 
-            
-            return response.data
-        
+            )
+            return response.data;
+        } catch (error) {
+            return rejectWithValue(error.response?.data || { success: false, message: 'Unauthorized User!' });
+        }
     }
 )
 
@@ -98,7 +109,10 @@ const authSlice = createSlice({
         resetTokenAndCredientials : (state)=>{
             state.token = null,
             state.isAthenticated = false,  
-            state.user = null
+            state.user = null;
+            if (typeof window !== 'undefined') {
+                sessionStorage.removeItem('token');
+            }
         }
     },
     extraReducers : (builder)=> {
@@ -115,17 +129,25 @@ const authSlice = createSlice({
         }).addCase(loginUser.pending, (state)=>{
             state.isLoading = true
         }).addCase(loginUser.fulfilled, (state, action)=>{
-            console.log(action);
+            const nextToken = action.payload?.token;
             state.isLoading = false,
-            state.token = action.payload.token, // only add this because i  need to buy custom domain and use https to set cookie with secure flag otherwise it will not work in production
-            sessionStorage.setItem('token', JSON.stringify(action.payload.token)), // only add this because i  need to buy custom domain and use https to set cookie with secure flag otherwise it will not work in production
-            state.isAthenticated = action.payload.success ? true : false,
-            state.user = action.payload.success ? action.payload.user : null
+            state.token = nextToken || null,
+            state.isAthenticated = action.payload?.success ? true : false,
+            state.user = action.payload?.success ? action.payload.user : null;
+
+            if (nextToken && typeof window !== 'undefined') {
+                sessionStorage.setItem('token', JSON.stringify(nextToken));
+            } else if (typeof window !== 'undefined') {
+                sessionStorage.removeItem('token');
+            }
         }).addCase(loginUser.rejected, (state)=>{
             state.isLoading= false,
             state.isAthenticated = false, 
-            state.user = null
-             state.token = null
+            state.user = null;
+            state.token = null;
+            if (typeof window !== 'undefined') {
+                sessionStorage.removeItem('token');
+            }
         }).addCase(checkAuth.pending, (state)=>{
             state.isLoading = true
         }).addCase(checkAuth.fulfilled, (state, action)=>{
@@ -135,7 +157,11 @@ const authSlice = createSlice({
         }).addCase(checkAuth.rejected, (state)=>{
             state.isLoading= false,
             state.isAthenticated = false, 
-            state.user = null
+            state.user = null;
+            state.token = null;
+            if (typeof window !== 'undefined') {
+                sessionStorage.removeItem('token');
+            }
         }).addCase(logoutUser.pending, (state)=>{
             state.isLoading = true
         }).addCase(logoutUser.fulfilled, (state)=>{

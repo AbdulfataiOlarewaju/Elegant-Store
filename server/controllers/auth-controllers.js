@@ -135,20 +135,22 @@ const logOutUser = async(req, res)=>{
 // }
 
 const authMiddleWare = async(req, res, next)=>{
-    const authHeader = req.headers['authorization']
-    const token = authHeader && authHeader.split(' ')[1] // because the token is in the format of
-    if(!token){
+    const authHeader = req.headers['authorization'] || '';
+    const token = authHeader.startsWith('Bearer ') ? authHeader.substring(7).trim() : null;
+
+    if(!token || token === 'null' || token === 'undefined'){
         return res.status(401).json({
             success : false,
             message : 'Unauthorized User!'
         })
     }
+
     try {
         const decodedToken = jwt.verify(token, process.env.JWT_SECRETE_KEY)
         req.user = decodedToken
         next()
     } catch (error) {
-         console.log(error);
+         console.log('JWT verification failed:', error.message);
         res.status(401).json({
             success : false,
             message : 'Unauthorized User!' 
